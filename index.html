@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Наши лучшие путешествия</title>
+    <!-- Стили для карты Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>🗺 Наши лучшие путешествия</h1>
+            <button id="open-add-modal" class="add-btn">➕ Добавить место</button>
+        </header>
+        
+        <!-- Контейнер для интерактивной карты -->
+        <div id="map"></div>
+
+        <main>
+            <h2>Список посещенных мест:</h2>
+            <div id="places-list" class="list-container"></div>
+        </main>
+    </div>
+
+    <!-- Модальное окно формы (для добавления и редактирования) -->
+    <div id="form-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 id="modal-title">Добавить путешествие</h3>
+            <input type="hidden" id="edit-id">
+            <div class="input-group">
+                <label for="place-name">Название города / места</label>
+                <input type="text" id="place-name" placeholder="Например: Париж">
+            </div>
+            <div class="input-group">
+                <label for="place-lat">Широта (Latitude)</label>
+                <input type="number" id="place-lat" step="any" placeholder="Например: 48.8566">
+            </div>
+            <div class="input-group">
+                <label for="place-lng">Долгота (Longitude)</label>
+                <input type="number" id="place-lng" step="any" placeholder="Например: 2.3522">
+            </div>
+            <p class="geo-hint">💡 Координаты любого места можно легко скопировать в Яндекс или Google картах.</p>
+            <div class="modal-actions">
+                <button id="close-modal" class="cancel-btn">Отмена</button>
+                <button id="save-place" class="save-btn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Скрипт карты Leaflet -->
+    <script src="https://unpkg.com"></script>
+    <script src="app.js"></script>
+</body>
+</html>
