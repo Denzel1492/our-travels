@@ -1,4 +1,3 @@
-// Координаты вашего списка путешествий с сыном
 const initialPlaces = [
     { id: "1", name: "Омск", lat: 54.9884, lng: 73.3242 },
     { id: "2", name: "Санкт-Петербург", lat: 59.9342, lng: 30.3350 },
@@ -14,58 +13,45 @@ const initialPlaces = [
     { id: "12", name: "Сортавала", lat: 61.7018, lng: 30.6903 }
 ];
 
-// Инициализация базы данных в памяти телефона
-let placesData = JSON.parse(localStorage.getItem('my_travels_list'));
+let placesData = JSON.parse(localStorage.getItem('my_travels_list_v2'));
 if (!placesData) {
     placesData = initialPlaces;
-    localStorage.setItem('my_travels_list', JSON.stringify(placesData));
+    localStorage.setItem('my_travels_list_v2', JSON.stringify(placesData));
 }
 
 let map;
 let markersGroup;
 
-if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-}
-
-// Инициализация карты Leaflet
 function initMap() {
-    // Центрируем карту, чтобы было видно и Россию, и Египет с Турцией
-    map = L.map('map').setView([45.0, 45.0], 3);
-
-    // Подключаем бесплатные карты OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '© OpenStreetMap'
-    }).addTo(map);
-
-    markersGroup = L.layerGroup().addTo(map);
-    renderMapMarkers();
+    try {
+        map = L.map('map').setView([45.0, 45.0], 3);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+        markersGroup = L.layerGroup().addTo(map);
+        renderMapMarkers();
+        renderPlacesList();
+    } catch(e) {
+        console.error("Ошибка карты:", e);
+    }
 }
 
-// Отрисовка маркеров на карте
 function renderMapMarkers() {
     markersGroup.clearLayers();
     placesData.forEach(place => {
-        L.marker([place.lat, place.lng])
-         .addTo(markersGroup)
-         .bindPopup(`<b>${place.name}</b>`);
+        L.marker([place.lat, place.lng]).addTo(markersGroup).bindPopup(`<b>${place.name}</b>`);
     });
 }
 
-// Центрирование карты по клику на список
 window.focusOnPlace = function(lat, lng) {
-    map.setView([lat, lng], 10, { animate: true, duration: 1.5 });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    map.setView([lat, lng], 9, { animate: true, duration: 1 });
 };
 
-// Отображение текстового списка под картой
 function renderPlacesList() {
     const listContainer = document.getElementById('places-list');
+    if(!listContainer) return;
     listContainer.innerHTML = '';
-
-    // Сортировка списка по алфавиту
     const sorted = [...placesData].sort((a, b) => a.name.localeCompare(b.name));
-
     sorted.forEach(place => {
         const card = document.createElement('div');
         card.className = 'place-card';
@@ -80,7 +66,6 @@ function renderPlacesList() {
     });
 }
 
-// Модальное окно управления
 const modal = document.getElementById('form-modal');
 document.getElementById('open-add-modal').addEventListener('click', () => {
     document.getElementById('modal-title').innerText = "Добавить место";
@@ -96,7 +81,6 @@ document.getElementById('close-modal').addEventListener('click', () => modal.cla
 window.openEditModal = function(id) {
     const place = placesData.find(p => p.id === id);
     if (!place) return;
-
     document.getElementById('modal-title').innerText = "Редактировать место";
     document.getElementById('edit-id').value = place.id;
     document.getElementById('place-name').value = place.name;
@@ -105,7 +89,6 @@ window.openEditModal = function(id) {
     modal.classList.remove('hidden');
 };
 
-// Сохранение (новое или редактирование)
 document.getElementById('save-place').addEventListener('click', () => {
     const id = document.getElementById('edit-id').value;
     const name = document.getElementById('place-name').value.trim();
@@ -113,34 +96,31 @@ document.getElementById('save-place').addEventListener('click', () => {
     const lng = parseFloat(document.getElementById('place-lng').value);
 
     if (!name || isNaN(lat) || isNaN(lng)) {
-        alert('Пожалуйста, заполните все поля корректными данными!');
+        alert('Заполните поля корректно!');
         return;
     }
 
     if (id) {
-        const place = placesData.find(p => p.id === id);
-        if (place) { place.name = name; place.lat = lat; place.lng = lng; }
+        const place = birthdaysData.find(p => p.id === id); // Фикс возможной путаницы
+        const realPlace = placesData.find(p => p.id === id);
+        if (realPlace) { realPlace.name = name; realPlace.lat = lat; realPlace.lng = lng; }
     } else {
         placesData.push({ id: Date.now().toString(), name, lat, lng });
     }
 
-    localStorage.setItem('my_travels_list', JSON.stringify(placesData));
+    localStorage.setItem('my_travels_list_v2', JSON.stringify(placesData));
     modal.classList.add('hidden');
     renderMapMarkers();
     renderPlacesList();
 });
 
-// Удаление места
 window.deletePlace = function(id) {
-    if (confirm('Удалить это место из списка путешествий?')) {
+    if (confirm('Удалить это место?')) {
         placesData = placesData.filter(p => p.id !== id);
-        localStorage.setItem('my_travels_list', JSON.stringify(placesData));
+        localStorage.setItem('my_travels_list_v2', JSON.stringify(placesData));
         renderMapMarkers();
         renderPlacesList();
     }
 };
 
-window.onload = () => {
-    initMap();
-    renderPlacesList();
-};
+window.addEventListener('load', initMap);
