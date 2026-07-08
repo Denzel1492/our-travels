@@ -30,8 +30,8 @@ if ('serviceWorker' in navigator) {
 
 // Инициализация карты Leaflet
 function initMap() {
-    // Центрируем карту примерно между Россией, Турцией и Египтом
-    map = L.map('map').setView([48.0, 45.0], 3);
+    // Центрируем карту, чтобы было видно и Россию, и Египет с Турцией
+    map = L.map('map').setView([45.0, 45.0], 3);
 
     // Подключаем бесплатные карты OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
