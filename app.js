@@ -13,10 +13,10 @@ const initialPlaces = [
     { id: "12", name: "Сортавала", lat: 61.7018, lng: 30.6903 }
 ];
 
-let placesData = JSON.parse(localStorage.getItem('my_travels_list_v2'));
+let placesData = JSON.parse(localStorage.getItem('my_travels_final_list'));
 if (!placesData) {
     placesData = initialPlaces;
-    localStorage.setItem('my_travels_list_v2', JSON.stringify(placesData));
+    localStorage.setItem('my_travels_final_list', JSON.stringify(placesData));
 }
 
 let map;
@@ -24,7 +24,7 @@ let markersGroup;
 
 function initMap() {
     try {
-        map = L.map('map').setView([45.0, 45.0], 3);
+        map = L.map('map').setView([48.0, 45.0], 3);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap'
         }).addTo(map);
@@ -32,7 +32,7 @@ function initMap() {
         renderMapMarkers();
         renderPlacesList();
     } catch(e) {
-        console.error("Ошибка карты:", e);
+        console.error("Ошибка инициализации карты:", e);
     }
 }
 
@@ -44,7 +44,8 @@ function renderMapMarkers() {
 }
 
 window.focusOnPlace = function(lat, lng) {
-    map.setView([lat, lng], 9, { animate: true, duration: 1 });
+    map.setView([lat, lng], 10, { animate: true, duration: 1.2 });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
 function renderPlacesList() {
@@ -96,19 +97,18 @@ document.getElementById('save-place').addEventListener('click', () => {
     const lng = parseFloat(document.getElementById('place-lng').value);
 
     if (!name || isNaN(lat) || isNaN(lng)) {
-        alert('Заполните поля корректно!');
+        alert('Пожалуйста, заполните все поля числовыми координатами!');
         return;
     }
 
     if (id) {
-        const place = birthdaysData.find(p => p.id === id); // Фикс возможной путаницы
         const realPlace = placesData.find(p => p.id === id);
         if (realPlace) { realPlace.name = name; realPlace.lat = lat; realPlace.lng = lng; }
     } else {
         placesData.push({ id: Date.now().toString(), name, lat, lng });
     }
 
-    localStorage.setItem('my_travels_list_v2', JSON.stringify(placesData));
+    localStorage.setItem('my_travels_final_list', JSON.stringify(placesData));
     modal.classList.add('hidden');
     renderMapMarkers();
     renderPlacesList();
@@ -117,7 +117,7 @@ document.getElementById('save-place').addEventListener('click', () => {
 window.deletePlace = function(id) {
     if (confirm('Удалить это место?')) {
         placesData = placesData.filter(p => p.id !== id);
-        localStorage.setItem('my_travels_list_v2', JSON.stringify(placesData));
+        localStorage.setItem('my_travels_final_list', JSON.stringify(placesData));
         renderMapMarkers();
         renderPlacesList();
     }
